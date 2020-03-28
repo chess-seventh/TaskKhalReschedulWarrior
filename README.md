@@ -48,7 +48,9 @@ __This part is still WIP__
 python main.py
 ```
 
-# TODO
+# TODO & WIP & IDEAS
+
+## TODO
 
 There are still many parts to improve and to do, here's a quick list:
 
@@ -60,4 +62,20 @@ There are still many parts to improve and to do, here's a quick list:
  - `./tasks.py`:   # TODO: Return Scheduled Tasks
 
 Most likely this project could be set a TaskWarrior [Hook](https://taskwarrior.org/docs/hooks2.html), but the current approach is not fit for it... yet.
+
+
+## WIP
+
+ - get tasks
+ - filter tasks with due dates
+ - check overdue tasks
+ - add due dates to tasks without
+ - get calendar events
+ - compate calendar events with tasks with due dates
+ - check for overdue tasks-events and postpone them to the end
+
+
+### IDEAS
+
+ - prioritize tasks scheduled date based on urgency flag
 
