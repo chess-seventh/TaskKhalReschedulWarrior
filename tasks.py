@@ -36,7 +36,7 @@ def overdue_tasks(tasks):
 
     """
     # TODO: Fix filtering of tasks
-    overdue = tasks.tasks.filter('+OVERDUE', project='lab')
+    overdue = tasks.tasks.filter('+OVERDUE')
     if overdue:
         return overdue
     return None

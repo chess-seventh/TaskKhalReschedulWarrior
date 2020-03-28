@@ -10,7 +10,7 @@ def sort_task_urgency(task):
     """Helper to sort tasks by urgency.
 
     :task: Task class.
-    :returns: The tasks' key.
+    :returns: The tasks' urgency.
 
     """
     return task['urgency']

@@ -1,5 +1,5 @@
 """
-File: task_rescheduler.py
+File: main.py
 Author: chess-seventh
 Email: chess7th@pm.me
 Github: https://github.com/chess-seventh
