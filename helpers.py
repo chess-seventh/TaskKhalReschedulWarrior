@@ -6,12 +6,11 @@ Github: https://github.com/chess-seventh
 Description: Module for function helpers.
 """
 
-def sort_task(task, key):
-    """Helper to sort tasks by given key.
+def sort_task_urgency(task):
+    """Helper to sort tasks by urgency.
 
     :task: Task class.
-    :key: Key to filter on.
     :returns: The tasks' key.
 
     """
-    return task[key]
+    return task['urgency']

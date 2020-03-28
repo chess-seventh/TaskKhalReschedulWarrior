@@ -27,6 +27,7 @@ def load_tasks(task_config):
             tasks.append(task)
     return tasks
 
+
 def overdue_tasks(tasks):
     """Filter overdue tasks.
 

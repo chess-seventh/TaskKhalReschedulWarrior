@@ -9,7 +9,7 @@ Description: TaskKhalReschedulWarrior.
 import configparser
 from constants import CONFIG_FILE
 from tasks import load_tasks
-from helpers import sort_task
+from helpers import sort_task_urgency
 
 
 def main(task_config, khal_config):
@@ -24,7 +24,7 @@ def main(task_config, khal_config):
     print(khal_config)
 
     tasks = load_tasks(task_config)
-    tasks.sort(key=sort_task, reverse=True)
+    tasks.sort(key=sort_task_urgency, reverse=True)
 
     for task in tasks:
         if task['scheduled'] and task['due']:
