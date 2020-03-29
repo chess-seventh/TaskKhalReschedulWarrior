@@ -7,6 +7,7 @@ Description: Task module.
 """
 
 import datetime
+import logger
 from tasklib import TaskWarrior as TW
 
 

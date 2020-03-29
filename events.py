@@ -8,6 +8,7 @@ Description:  Module for calendar and events for Khal.
 
 import datetime
 from datetime import date, timedelta
+from logger import logger
 from ics import Event
 # from ics import Calendar
 
@@ -62,7 +63,7 @@ def event_task_status(task):
 
     """
     # TODO: Check status of Event Task
-    print(task)
+    logger.debug(task)
 
 
 def event_task_amend(task, calendar):
@@ -74,4 +75,4 @@ def event_task_amend(task, calendar):
 
     """
     # TODO: Amend Task Event and Task
-    print(task, calendar)
+    logger.debug(task, calendar)
