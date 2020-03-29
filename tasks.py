@@ -6,6 +6,7 @@ Github: https://github.com/chess-seventh
 Description: Task module.
 """
 
+import datetime
 from tasklib import TaskWarrior as TW
 
 
@@ -35,11 +36,13 @@ def overdue_tasks(tasks):
     :returns: List of all overdue tasks.
 
     """
-    # TODO: Fix filtering of tasks
-    overdue = tasks.tasks.filter('+OVERDUE')
-    if overdue:
-        return overdue
-    return None
+    today = datetime.datetime.now()
+    overdue = list()
+    for task in tasks:
+        if task['due']:
+            if today >= task['due'].replace(tzinfo=None):
+                overdue.append(task)
+    return overdue
 
 
 def scheduled_tasks(tasks):
@@ -49,5 +52,11 @@ def scheduled_tasks(tasks):
     :returns: List of scheduled tasks.
 
     """
-    # TODO: Return Scheduled Tasks
-    print(tasks)
+    today = datetime.datetime.now()
+    scheduled = list()
+    for task in tasks:
+        if task['scheduled']:
+            if today >= task['scheduled'].replace(tzinfo=None):
+                print(task['scheduled'])
+                scheduled.append(task)
+    return scheduled

@@ -9,6 +9,9 @@ Description: TaskKhalReschedulWarrior.
 import configparser
 from constants import CONFIG_FILE
 from tasks import load_tasks
+from tasks import scheduled_tasks
+from tasks import overdue_tasks
+
 from helpers import sort_task_urgency
 
 
@@ -26,10 +29,13 @@ def main(task_config, khal_config):
     tasks = load_tasks(task_config)
     tasks.sort(key=sort_task_urgency, reverse=True)
 
-    for task in tasks:
-        if task['scheduled'] and task['due']:
-            print(task, task['scheduled'], task['due'])
+    tasks_sched = scheduled_tasks(tasks)
+    tasks_overdue = overdue_tasks(tasks)
+    print("scheduled")
+    print(tasks_sched)
 
+    print("overdue")
+    print(tasks_overdue)
 
 if __name__ == "__main__":
     CONFIG = configparser.ConfigParser()
@@ -39,7 +45,7 @@ if __name__ == "__main__":
     TASK_CONF.append(CONFIG['TaskConfig']['TaskProjects'].split(','))
     print(TASK_CONF)
 
-    # TODO: Check what directory needs to be set.
+    # TODO: Set proper directory.
     KHAL_CONF = list()
     KHAL_CONF.append(CONFIG['KhalConfig']['KhalDir'])
     KHAL_CONF.append(CONFIG['KhalConfig']['KhalCalendar'])
