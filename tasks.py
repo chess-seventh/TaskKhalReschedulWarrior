@@ -57,6 +57,5 @@ def scheduled_tasks(tasks):
     for task in tasks:
         if task['scheduled']:
             if today >= task['scheduled'].replace(tzinfo=None):
-                print(task['scheduled'])
                 scheduled.append(task)
     return scheduled

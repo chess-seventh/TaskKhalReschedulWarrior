@@ -43,12 +43,10 @@ if __name__ == "__main__":
     TASK_CONF = list()
     TASK_CONF.append(CONFIG['TaskConfig']['TaskDir'])
     TASK_CONF.append(CONFIG['TaskConfig']['TaskProjects'].split(','))
-    print(TASK_CONF)
 
     # TODO: Set proper directory.
     KHAL_CONF = list()
     KHAL_CONF.append(CONFIG['KhalConfig']['KhalDir'])
     KHAL_CONF.append(CONFIG['KhalConfig']['KhalCalendar'])
-    print(KHAL_CONF)
 
     main(task_config=TASK_CONF, khal_config=KHAL_CONF)
