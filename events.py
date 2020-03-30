@@ -54,7 +54,6 @@ def month_sundays(year, month):
         date_sun += timedelta(days=7)
 
 
-
 def event_task_status(task):
     """Check if task on calendar is done.
 

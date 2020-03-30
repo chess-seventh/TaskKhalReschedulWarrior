@@ -47,5 +47,5 @@ def normalize_task_date(date, key):
     :returns: TODO
 
     """
-    if isinstance(date[key], datetime):
+    if isinstance(date[key], datetime.datetime):
         return date[key].replace(tzinfo=None)
