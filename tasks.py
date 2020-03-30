@@ -61,3 +61,18 @@ def scheduled_tasks(tasks):
             if today >= normalize_task_date(task, 'scheduled'):
                 scheduled.append(task)
     return scheduled
+
+
+def not_date_tasks(tasks):
+    """Filter tasks with no due date
+
+    :tasks: List of all tasks.
+    :returns: List of scheduled tasks.
+
+    """
+    not_due = list()
+    for task in tasks:
+        if not task['due']:
+
+            not_due.append(task)
+    return not_due
