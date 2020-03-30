@@ -12,7 +12,6 @@ from tasks import load_tasks
 from tasks import scheduled_tasks
 from tasks import overdue_tasks
 from logger import logger
-
 from helpers import sort_task_urgency
 
 

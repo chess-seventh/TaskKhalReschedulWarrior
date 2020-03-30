@@ -7,8 +7,9 @@ Description: Task module.
 """
 
 import datetime
-import logger
 from tasklib import TaskWarrior as TW
+from logger import logger
+from helpers import normalize_task_date
 
 
 def load_tasks(task_config):
@@ -41,7 +42,7 @@ def overdue_tasks(tasks):
     overdue = list()
     for task in tasks:
         if task['due']:
-            if today >= task['due'].replace(tzinfo=None):
+            if today >= normalize_task_date(task, 'due'):
                 overdue.append(task)
     return overdue
 
@@ -57,6 +58,6 @@ def scheduled_tasks(tasks):
     scheduled = list()
     for task in tasks:
         if task['scheduled']:
-            if today >= task['scheduled'].replace(tzinfo=None):
+            if today >= normalize_task_date(task, 'scheduled'):
                 scheduled.append(task)
     return scheduled
