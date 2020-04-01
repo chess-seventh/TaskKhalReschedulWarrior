@@ -11,6 +11,7 @@ from constants import CONFIG_FILE
 from tasks import load_tasks
 from tasks import scheduled_tasks
 from tasks import overdue_tasks
+from tasks import not_date_tasks
 from logger import logger
 from helpers import sort_task_urgency
 
@@ -31,11 +32,15 @@ def main(task_config, khal_config):
 
     tasks_sched = scheduled_tasks(tasks)
     tasks_overdue = overdue_tasks(tasks)
-    logger.debug("scheduled")
-    logger.debug(tasks_sched)
 
-    logger.debug("overdue")
-    logger.debug(tasks_overdue)
+    # logger.debug("scheduled")
+    # logger.debug(tasks_sched)
+
+    # logger.debug("overdue")
+    # logger.debug(tasks_overdue)
+    not_date_tasks(tasks)
+
+
 
 if __name__ == "__main__":
     CONFIG = configparser.ConfigParser()

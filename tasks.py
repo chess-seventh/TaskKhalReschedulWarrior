@@ -8,8 +8,9 @@ Description: Task module.
 
 import datetime
 from tasklib import TaskWarrior as TW
-from logger import logger
+# from logger import logger
 from helpers import normalize_task_date
+from helpers import output_task
 
 
 def load_tasks(task_config):
@@ -73,6 +74,6 @@ def not_date_tasks(tasks):
     not_due = list()
     for task in tasks:
         if not task['due']:
-
+            output_task(task)
             not_due.append(task)
     return not_due
