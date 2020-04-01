@@ -7,6 +7,7 @@ Description: Module for function helpers.
 """
 
 import datetime
+from logger import logger
 
 
 def sort_task_urgency(task):
@@ -49,3 +50,13 @@ def normalize_task_date(date, key):
     """
     if isinstance(date[key], datetime.datetime):
         return date[key].replace(tzinfo=None)
+
+
+def output_task(task):
+    """TODO: Docstring for output_task.
+
+    :task: The task to output.
+    :returns: None
+
+    """
+    logger.debug('%s' % [task['uuid'], task['due'], task])
