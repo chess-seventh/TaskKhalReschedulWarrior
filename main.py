@@ -8,6 +8,8 @@ Description: TaskKhalReschedulWarrior.
 
 import configparser
 from constants import CONFIG_FILE
+from constants import DAY
+from events import next_days
 from tasks import load_tasks
 from tasks import scheduled_tasks
 from tasks import overdue_tasks
