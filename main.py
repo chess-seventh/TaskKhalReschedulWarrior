@@ -43,8 +43,11 @@ def main(task_config, khal_config):
 
     # logger.debug("overdue")
     # logger.debug(tasks_overdue)
-    not_date_tasks(tasks)
 
+    no_date_t = not_date_tasks(tasks)
+    sundays = list(map(add_time, next_days(DAY['SUN'])))
+    cal = create_events(no_date_t, sundays)
+    print(cal)
 
 
 if __name__ == "__main__":
