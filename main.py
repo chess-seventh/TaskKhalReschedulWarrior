@@ -38,12 +38,6 @@ def main(task_config, khal_config):
     tasks_sched = scheduled_tasks(tasks)
     tasks_overdue = overdue_tasks(tasks)
 
-    # logger.debug("scheduled")
-    # logger.debug(tasks_sched)
-
-    # logger.debug("overdue")
-    # logger.debug(tasks_overdue)
-
     no_date_t = not_date_tasks(tasks)
     sundays = list(map(add_time, next_days(DAY['SUN'])))
     cal = create_events(no_date_t, sundays)
@@ -57,7 +51,6 @@ if __name__ == "__main__":
     TASK_CONF.append(CONFIG['TaskConfig']['TaskDir'])
     TASK_CONF.append(CONFIG['TaskConfig']['TaskProjects'].split(','))
 
-    # TODO: Set proper directory.
     KHAL_CONF = list()
     KHAL_CONF.append(CONFIG['KhalConfig']['KhalDir'])
     KHAL_CONF.append(CONFIG['KhalConfig']['KhalCalendar'])
