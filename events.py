@@ -11,20 +11,31 @@ from datetime import date, timedelta
 from logger import logger
 from ics import Event
 from ics import Calendar
+from helpers import set_task_date
 
 
-def create_event(task, scheduled):
+def create_events(tasks, scheduled_dates):
     """Create an Event based on task parameters.
 
     :task: Task to create an event from.
     :returns: Event file
 
     """
+    for dates in scheduled_dates:
+        set_task_date(dates)
+
+    iter_dates = iter(scheduled_dates)
     calendar = Calendar()
-    event = Event()
-    event.name = task['description']
-    event.uid = task['uuid']
-    event.begin = "1"
+    for task in tasks:
+        event = Event()
+        try:
+            event.name = task['description']
+            event.uid = task['uuid']
+            event.begin = next(iter_dates)
+            print(event.begin)
+            calendar.events.add(event)
+        except StopIteration:
+            return calendar
     # task and event must have same
     # event.begin = datetime.datetime.now()
     # event.end = datetime.datetime.now()+1
@@ -39,7 +50,7 @@ def next_days(day_of_week):
     year = today.year
 
     chosen_day = list()
-    for sunday in month_chosen_day(year, month, chosen_day):
+    for sunday in month_chosen_day(year, month, day_of_week):
         chosen_day.append(sunday)
     return chosen_day
 
