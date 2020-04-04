@@ -60,3 +60,13 @@ def output_task(task):
 
     """
     logger.debug('%s' % [task['uuid'], task['due'], task])
+
+
+def set_task_date(task_date):
+    """Sets the task date to proper formatting.
+    :task_date: The tasks date.
+    :return: The changed date for task.
+
+    """
+    return pytz.timezone('Europe/Zurich').localize(task_date)
+
