@@ -21,7 +21,7 @@ def create_events(tasks, scheduled_dates):
     :returns: Event file
 
     """
-    iter_dates = iter(list(map(set_task_date, scheduled_dates)))
+    iter_dates = iter(scheduled_dates)
 
     calendar = Calendar()
     for task in tasks:
