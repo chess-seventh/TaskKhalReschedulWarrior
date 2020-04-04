@@ -50,7 +50,7 @@ def normalize_task_date(date, key):
     """
     if isinstance(date[key], datetime.datetime):
         return date[key].replace(tzinfo=None)
-
+    return None
 
 def output_task(task):
     """TODO: Docstring for output_task.
