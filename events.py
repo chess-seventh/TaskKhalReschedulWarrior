@@ -81,9 +81,9 @@ def event_task_status(task):
 def event_task_amend(task, calendar):
     """Amend the calendar task.
 
-    :taks: Task class to change.
-    :calendar: Calendar class to configure.
-    :returns: New calendar event.
+    :tasks: task class to change.
+    :calendar: calendar class to configure.
+    :returns: new calendar event.
 
     """
     # TODO: Amend Task Event and Task
