@@ -88,3 +88,17 @@ def event_task_amend(task, calendar):
     """
     # TODO: Amend Task Event and Task
     logger.debug(task, calendar)
+
+
+def add_time(date):
+    """Add time to date.
+
+    :hour: Hour.
+    :minutes: Minutes
+    :returns: The modified new date.
+
+    """
+    hour = 7
+    minutes = 30
+    new_date = datetime.datetime.combine(date, datetime.time(hour, minutes))
+    return new_date
