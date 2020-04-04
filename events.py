@@ -30,7 +30,6 @@ def create_events(tasks, scheduled_dates):
             event.name = task['description']
             event.uid = task['uuid']
             event.begin = next(iter_dates)
-            print(event.begin)
             calendar.events.add(event)
         except StopIteration:
             return calendar
