@@ -32,6 +32,7 @@ The `config.ini` file is where the project will fetch the data of TaskWarrior an
 ## TaskConfig
 
 `TaskDir`: Is the directory where you TaskWarrior data is stored.
+
 `TaskProjects`: A list of the TaskWarrior projects you'd like to work on during your "lazy" sundays.
 
 ## KhalConfig
@@ -39,6 +40,7 @@ The `config.ini` file is where the project will fetch the data of TaskWarrior an
 __This part is still WIP__
 
 `KhalDir`: Directory of Khal
+
 `KhalCalendar`: To which Khal Calendar the `EventTasks` should be scheduled.
 
 
