@@ -53,6 +53,7 @@ def normalize_task_date(date, key):
         return date[key].replace(tzinfo=None)
     return None
 
+
 def output_task(task):
     """TODO: Docstring for output_task.
 

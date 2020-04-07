@@ -10,9 +10,6 @@ import datetime
 from tasklib import TaskWarrior as TW
 from helpers import normalize_task_date
 
-# from helpers import output_task
-# from logger import logger
-
 
 def load_tasks(task_config):
     """Load tasks based on parsed config.
