@@ -86,7 +86,7 @@ Most likely this project could be set a TaskWarrior [Hook](https://taskwarrior.o
 **Note:**
 This project is released with a Contributor Code of Conduct.
 By participating in this project **you agree** to abide by its terms.
-See the [code_of_conduct.md](code_of_conduct.md) file for details.
+See the [CODE OF CONDUCT.md](CODE_OF_CONDUCT.md) file for details.
 
 1. Fork it!
 2. Create your feature branch: `git checkout -b my-new-feature`
