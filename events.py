@@ -8,19 +8,20 @@ Description:  Module for calendar and events for Khal.
 
 import datetime
 from datetime import date, timedelta
-from logger import logger
 from ics import Event
 from ics import Calendar
-from helpers import set_task_date
+from logger import logger
+# from helpers import set_task_date
 
 
-def create_events(tasks, scheduled_dates):
+def create_events(tasks, scheduled_dates, cal_name):
     """Create an Event based on task parameters.
 
     :task: Task to create an event from.
     :returns: Event file
 
     """
+    # TODO: check that task and event must have same date
     iter_dates = iter(scheduled_dates)
 
     calendar = Calendar()
@@ -32,10 +33,13 @@ def create_events(tasks, scheduled_dates):
             event.begin = next(iter_dates)
             calendar.events.add(event)
         except StopIteration:
-            return calendar
-    # task and event must have same
-    # event.begin = datetime.datetime.now()
-    # event.end = datetime.datetime.now()+1
+            break
+
+    cal_name += ".ics"
+    with open(cal_name, 'w') as cal_file:
+        cal_file.writelines(calendar)
+
+    return cal_name
 
 
 def next_days(day_of_week):
