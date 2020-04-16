@@ -56,11 +56,16 @@ def next_days(day_of_week):
     return chosen_day
 
 
-def month_chosen_day(year, month, chosen_day):
+def month_chosen_day(year, month, week_day):
     """Yields sundays for current month.
-    :returns: List of future sundays.
+
+    :year: Year of the event to be set.
+    :month: Month of the event to be set.
+    :week_day: Day of the week (MON/SUN...) of the event to be set.
+    :returns: List of future week days to be scheduled.
 
     """
+    # TODO: Fix chosen day variable to be pickedup.
     date_chosen = date(year, month, 1)
     date_chosen += timedelta(days=7 - date_chosen.weekday())
     while date_chosen.year == year and date_chosen.month == month:
