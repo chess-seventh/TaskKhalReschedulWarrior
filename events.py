@@ -22,7 +22,15 @@ def create_events(tasks, scheduled_dates, cal_name):
 
     """
     # TODO: check that task and event must have same date
-    iter_dates = iter(scheduled_dates)
+    today = datetime.datetime.now()
+    today_day = today.date()
+    next_day = datetime.datetime.combine(today_day, datetime.time(8,30,0))
+    planned_dates = list()
+    for day in len(tasks):
+        next_day += datetime.datetime.timedelta(days=1)
+        planned_dates.append(next_day)
+
+    iter_dates = iter(planned_dates)
 
     calendar = Calendar()
     for task in tasks:
