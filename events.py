@@ -11,43 +11,34 @@ from datetime import date, timedelta
 from ics import Event
 from ics import Calendar
 from logger import logger
-# from helpers import set_task_date
+from helpers import format_date
+from helpers import execute
 
 
-def create_events(tasks, scheduled_dates, cal_name):
+def create_events(tasks, khal_config):
     """Create an Event based on task parameters.
 
     :task: Task to create an event from.
     :returns: Event file
 
     """
-    # TODO: check that task and event must have same date
     today = datetime.datetime.now()
     today_day = today.date()
-    next_day = datetime.datetime.combine(today_day, datetime.time(8,30,0))
-    planned_dates = list()
-    for day in len(tasks):
-        next_day += datetime.datetime.timedelta(days=1)
-        planned_dates.append(next_day)
-
-    iter_dates = iter(planned_dates)
-
-    calendar = Calendar()
+    next_day = datetime.datetime.combine(today_day, datetime.time(8, 30, 0))
     for task in tasks:
+        next_day += datetime.timedelta(days=1)
+        calendar = Calendar()
         event = Event()
-        try:
-            event.name = task['description']
-            event.uid = task['uuid']
-            event.begin = next(iter_dates)
-            calendar.events.add(event)
-        except StopIteration:
-            break
+        event.name = task['description']
+        event.uid = task['uuid']
+        event.begin = format_date(next_day)
+        calendar.events.add(event)
 
-    cal_name += ".ics"
-    with open(cal_name, 'w') as cal_file:
-        cal_file.writelines(calendar)
+        ics_name = "./ics/" + task['uuid'] + ".ics"
+        with open(ics_name, 'w') as cal_file:
+            cal_file.writelines(calendar)
 
-    return cal_name
+        execute(khal_config, ics_name)
 
 
 def next_days(day_of_week):
