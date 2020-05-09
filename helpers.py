@@ -56,6 +56,16 @@ def normalize_task_date(date, key):
     return None
 
 
+def format_date(date):
+    """Changes the date into the TaskWarrior format. (%Y%m%dT%H%M%SZ)
+    :date: The date to be formatted.
+    :returns: The formatted date.
+
+    """
+    print(date)
+    return date.strftime("%Y%m%dT%H%M%SZ")
+
+
 def output_task(task):
     """TODO: Docstring for output_task.
 
