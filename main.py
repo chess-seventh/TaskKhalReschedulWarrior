@@ -9,20 +9,20 @@ Description: TaskKhalReschedulWarrior.
 import configparser
 
 from constants import CONFIG_FILE
-from constants import DAY
+# from constants import DAY
 
-from events import next_days
+# from events import next_days
 from events import create_events
-from events import add_time
+# from events import add_time
 
 from tasks import load_tasks
-from tasks import scheduled_tasks
+# from tasks import scheduled_tasks
 from tasks import overdue_tasks
 from tasks import not_date_tasks
 
 from logger import logger
 from helpers import sort_task_urgency
-from helpers import execute
+# from helpers import execute
 
 
 def main(task_config, khal_config):
@@ -40,20 +40,15 @@ def main(task_config, khal_config):
     tasks = load_tasks(task_config)
     tasks.sort(key=sort_task_urgency, reverse=True)
 
-    tasks_sched = scheduled_tasks(tasks)
-    tasks_overdue = overdue_tasks(tasks)
-    tasks_nodate = not_date_tasks(tasks)
+    # tasks_sched = scheduled_tasks(tasks)
+    # events_sched = create_events(tasks_sched)
+    nodates_tasks = overdue_tasks(tasks) + not_date_tasks(tasks)
 
-    sundays = list(map(add_time, next_days(DAY['SUN'])))
-    mondays = list(map(add_time, next_days(DAY['MON'])))
-    wednesdays = list(map(add_time, next_days(DAY['WED'])))
-    cal_sundays = create_events(tasks_nodate, sundays, 'sunday')
-    cal_mondays = create_events(tasks_overdue, mondays, 'mondays')
-    cal_wednesdays = create_events(tasks_sched, wednesdays, 'wednesday')
+    create_events(nodates_tasks, khal_config)
 
-    execute(khal_config, cal_sundays)
-    execute(khal_config, cal_mondays)
-    execute(khal_config, cal_wednesdays)
+    # execute(khal_config, cal_sundays)
+    # execute(khal_config, cal_mondays)
+    # execute(khal_config, cal_wednesdays)
 
 
 if __name__ == "__main__":
