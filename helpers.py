@@ -62,8 +62,7 @@ def format_date(date):
     :returns: The formatted date.
 
     """
-    print(date)
-    return date.strftime("%Y%m%dT%H%M%SZ")
+    return date.strftime("%Y%m%dT%H:%M:%SZ+02:00")
 
 
 def output_task(task):
