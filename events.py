@@ -11,7 +11,7 @@ from datetime import date, timedelta
 from ics import Event
 from ics import Calendar
 from logger import logger
-from helpers import format_date
+# from helpers import format_date
 from helpers import execute
 
 
@@ -31,7 +31,8 @@ def create_events(tasks, khal_config):
         event = Event()
         event.name = task['description']
         event.uid = task['uuid']
-        event.begin = format_date(next_day)
+        # event.begin = format_date(next_day)
+        event.begin = next_day
         calendar.events.add(event)
 
         ics_name = "./ics/" + task['uuid'] + ".ics"
