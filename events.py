@@ -8,34 +8,37 @@ Description:  Module for calendar and events for Khal.
 
 import datetime
 from datetime import date, timedelta
-from logger import logger
 from ics import Event
 from ics import Calendar
-from helpers import set_task_date
+from logger import logger
+from helpers import format_date
+from helpers import execute
 
 
-def create_events(tasks, scheduled_dates):
+def create_events(tasks, khal_config):
     """Create an Event based on task parameters.
 
     :task: Task to create an event from.
     :returns: Event file
 
     """
-    iter_dates = iter(list(map(set_task_date, scheduled_dates)))
-
-    calendar = Calendar()
+    today = datetime.datetime.now()
+    today_day = today.date()
+    next_day = datetime.datetime.combine(today_day, datetime.time(8, 30, 0))
     for task in tasks:
+        next_day += datetime.timedelta(days=1)
+        calendar = Calendar()
         event = Event()
-        try:
-            event.name = task['description']
-            event.uid = task['uuid']
-            event.begin = next(iter_dates)
-            calendar.events.add(event)
-        except StopIteration:
-            return calendar
-    # task and event must have same
-    # event.begin = datetime.datetime.now()
-    # event.end = datetime.datetime.now()+1
+        event.name = task['description']
+        event.uid = task['uuid']
+        event.begin = format_date(next_day)
+        calendar.events.add(event)
+
+        ics_name = "./ics/" + task['uuid'] + ".ics"
+        with open(ics_name, 'w') as cal_file:
+            cal_file.writelines(calendar)
+
+        execute(khal_config, ics_name)
 
 
 def next_days(day_of_week):
@@ -52,11 +55,16 @@ def next_days(day_of_week):
     return chosen_day
 
 
-def month_chosen_day(year, month, chosen_day):
+def month_chosen_day(year, month, week_day):
     """Yields sundays for current month.
-    :returns: List of future sundays.
+
+    :year: Year of the event to be set.
+    :month: Month of the event to be set.
+    :week_day: Day of the week (MON/SUN...) of the event to be set.
+    :returns: List of future week days to be scheduled.
 
     """
+    # TODO: Fix chosen day variable to be pickedup.
     date_chosen = date(year, month, 1)
     date_chosen += timedelta(days=7 - date_chosen.weekday())
     while date_chosen.year == year and date_chosen.month == month:

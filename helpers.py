@@ -7,8 +7,10 @@ Description: Module for function helpers.
 """
 
 import datetime
-from logger import logger
+# from subprocess import PIPE, run
+import subprocess
 import pytz
+from logger import logger
 
 
 def sort_task_urgency(task):
@@ -53,6 +55,17 @@ def normalize_task_date(date, key):
         return date[key].replace(tzinfo=None)
     return None
 
+
+def format_date(date):
+    """Changes the date into the TaskWarrior format. (%Y%m%dT%H%M%SZ)
+    :date: The date to be formatted.
+    :returns: The formatted date.
+
+    """
+    print(date)
+    return date.strftime("%Y%m%dT%H%M%SZ")
+
+
 def output_task(task):
     """TODO: Docstring for output_task.
 
@@ -71,3 +84,17 @@ def set_task_date(task_date):
     """
     return pytz.timezone('Europe/Zurich').localize(task_date)
 
+
+def execute(khal_calendar, calendar_file):
+    """Execute Khal import command in shell.
+
+    :calendar_file: Calendar file to import in Khal.
+    :returns: The exit result of the command.
+    """
+    command = ["khal", "import", "-a"] + khal_calendar
+    command.append(calendar_file)
+    command.append("--batch")  # no confirmations
+
+    subprocess.check_output(command)
+
+    # return result
