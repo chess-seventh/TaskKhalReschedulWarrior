@@ -9,6 +9,15 @@ Description: Task module.
 import datetime
 from tasklib import TaskWarrior as TW
 from helpers import normalize_task_date
+from taskw import TaskWarrior as TaskW
+
+
+def load_tw_config():
+    """
+    Load TaskWarrior configuration to get the UDA.
+    """
+    tw = TaskW()
+    return tw.load_config()
 
 
 def load_tasks(task_config):
