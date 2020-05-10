@@ -5,28 +5,20 @@ Email: chess7th@pm.me
 Github: https://github.com/chess-seventh
 Description: TaskKhalReschedulWarrior.
 """
+from taskw import TaskWarrior as TaskW
 
-import configparser
-
-from constants import CONFIG_FILE
-# from constants import DAY
-
-# from events import next_days
 from events import create_events
-# from events import add_time
 
 from tasks import load_tasks
-# from tasks import scheduled_tasks
 from tasks import overdue_tasks
 from tasks import not_date_tasks
-from tasks import load_tw_config
+
 
 from logger import logger
 from helpers import sort_task_urgency
-# from helpers import execute
 
 
-def main(task_config, khal_config):
+def main():
     """TaskKhalReschedulWarrior.
 
     :task_config: TaskWarrior configuration.
@@ -36,14 +28,20 @@ def main(task_config, khal_config):
     """
     # TODO: Khal logic
     # TODO: Set khal proper days
-    logger.debug(khal_config)
-    config = load_tw_config()
 
-    projects = list(config.get('uda.trsw.projects'))
-    print(projects)
+    task_war = TaskW()
+    tw_config = task_war.load_config()
+    tw_config_location = tw_config['data']['location']
+    tw_projects = tw_config['uda.trsw.projects'].split(',')
+    khal_location = tw_config['uda.calendar.location']
+    khal_config = tw_config['uda.khal.config']
+
+    print(tw_projects)
+    print(khal_location)
+    print(khal_config)
     return
 
-    tasks = load_tasks(task_config)
+    tasks = load_tasks(tw_config_location)
     tasks.sort(key=sort_task_urgency, reverse=True)
 
     # tasks_sched = scheduled_tasks(tasks)
@@ -61,14 +59,4 @@ def main(task_config, khal_config):
 
 
 if __name__ == "__main__":
-    CONFIG = configparser.ConfigParser()
-    CONFIG.read(CONFIG_FILE)
-    TASK_CONF = list()
-    TASK_CONF.append(CONFIG['TaskConfig']['TaskDir'])
-    TASK_CONF.append(CONFIG['TaskConfig']['TaskProjects'].split(','))
-
-    KHAL_CONF = list()
-    # KHAL_CONF.append(CONFIG['KhalConfig']['KhalDir'])
-    KHAL_CONF.append(CONFIG['KhalConfig']['KhalCalendar'])
-
-    main(task_config=TASK_CONF, khal_config=KHAL_CONF)
+    main()

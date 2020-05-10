@@ -9,7 +9,6 @@ Description: Task module.
 import datetime
 from tasklib import TaskWarrior as TW
 from helpers import normalize_task_date
-from taskw import TaskWarrior as TaskW
 
 
 def load_tw_config():
