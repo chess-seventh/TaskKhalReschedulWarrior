@@ -1,0 +1,152 @@
+#!/usr/bin/env python3
+"""
+TaskWarrior Hook to add scheduled or due event to khal by checking if the
+UUID exists.
+This works for Khal Events added by Khal that have the same UUID (ics file).
+"""
+import json
+import subprocess
+import sys
+from datetime import datetime as dt
+from datetime import timedelta
+
+from pathlib import Path
+
+from ics import Event
+from ics import Calendar
+from taskw import TaskWarrior as TaskW
+
+
+def main(new_task):
+    """
+    Function that runs everything.
+
+    :new_task: STDIN value.
+    :returns: JSON formatted task.
+    """
+    task_war = TaskW()
+    tw_config = task_war.load_config()
+    projects_list = tw_config["trsw_projects"].split(",")
+    task_project = new_task["project"].split(".")[0]
+
+    if "bm" in new_task["project"]:
+        khal_calendar = "work"
+    elif task_project in projects_list:
+        khal_calendar = new_task["project"].split(".")[0]
+    else:
+        khal_calendar = "calendar"
+
+    check_existing_event(new_task["uuid"], khal_calendar)
+
+    if 'scheduled' in new_task:
+        scheduled_task(new_task, khal_calendar)
+
+    if 'due' in new_task:
+        due_task(new_task, khal_calendar)
+
+    new_task["tags"].append("khal")
+    sys.stdout.write(json.dumps(new_task, separators=(",", ":")))
+    sys.exit(0)
+
+
+def scheduled_task(new_task, khal_calendar):
+    """
+    Function to handle scheduled tasks
+
+    :new_task: task to add to khal.
+    :khal_calendar: khal calendar to add the event with a scheduled date.
+
+    :return: None
+    """
+    calendar = Calendar()
+    event = Event()
+    event.name = new_task["project"] + ":" + new_task["description"]
+    event.uid = new_task["uuid"]
+
+    start = dt.strptime(new_task["scheduled"], "%Y%m%dT%H%M%SZ")
+    event.begin = start.strftime("%Y%m%dT%H%M%SZ+02:00")
+    day_end = start + timedelta(hours=1)
+    event.end = day_end.strftime("%Y%m%dT%H%M%SZ+02:00")
+
+    calendar.events.add(event)
+
+    ics_name = new_task['uuid'] + ".ics"
+    with open(ics_name, 'w') as cal_file:
+        cal_file.writelines(calendar)
+
+    execute(khal_calendar, ics_name)
+    cleanup(ics_name)
+
+
+def due_task(new_task, khal_calendar):
+    """
+    Function to handle due tasks
+
+    :new_task: task to add to khal.
+    :khal_calendar: khal calendar to add the event with a due date.
+
+    :return: None
+    """
+    calendar = Calendar()
+    event = Event()
+    event.name = new_task["project"] + ":" + new_task["description"]
+    event.uid = new_task["uuid"]
+
+    start = dt.strptime(new_task["due"], "%Y%m%dT%H%M%SZ")
+    event.begin = start.strftime("%Y%m%dT%H%M%SZ+02:00")
+    day_end = start + timedelta(hours=1)
+    event.end = day_end.strftime("%Y%m%dT%H%M%SZ+02:00")
+
+    calendar.events.add(event)
+
+    ics_name = new_task['uuid'] + ".ics"
+    with open(ics_name, 'w') as cal_file:
+        cal_file.writelines(calendar)
+
+    execute(khal_calendar, ics_name)
+    cleanup(ics_name)
+
+
+def execute(khal_calendar, ics_file):
+    """Execute Khal import command in shell.
+
+    :calendar_file: Calendar file to import in Khal.
+    :returns: The exit result of the command.
+    """
+    command = ["khal", "import", "-a", khal_calendar]
+    command.append(ics_file)
+    command.append("--batch")  # no confirmations
+
+    proc = subprocess.Popen(command, stdout=subprocess.PIPE)
+    proc.communicate()
+
+
+def cleanup(ics_name):
+    """Function that cleans up what we created.
+    :ics_name: The ics file to be removed.
+    :returns: None
+    """
+    command = ["rm", "-f", ics_name]
+    proc = subprocess.Popen(command, stdout=subprocess.PIPE)
+    proc.communicate()
+
+
+def check_existing_event(ics_uuid, khal_calendar):
+    """Checks if the UUID of an event created by Task exists already. If the
+    event exists already delete the existing entry.
+    """
+    khal_calendar_location = "~/.calendars/khal/" \
+        + khal_calendar \
+        + "/" \
+        + ics_uuid \
+        + ".ics"
+    event_file = Path(khal_calendar_location)
+    if event_file.is_file():
+        command = ["rm", "-f", khal_calendar_location]
+        proc = subprocess.Popen(command, stdout=subprocess.PIPE)
+        proc.communicate()
+
+
+if __name__ == "__main__":
+    TW_TASK = json.loads(sys.stdin.readline())
+    main(TW_TASK)
