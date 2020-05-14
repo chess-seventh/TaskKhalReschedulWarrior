@@ -7,11 +7,11 @@ This works for Khal Events added by Khal that have the same UUID (ics file).
 import json
 import subprocess
 import sys
-# import datetime
 from datetime import datetime as dt
 from datetime import timedelta
 
 from pathlib import Path
+from pytz import timezone
 
 from ics import Event
 from ics import Calendar
@@ -26,9 +26,8 @@ def main(original_task, modified_task):
     :returns: JSON formatted task.
     """
     if 'deleted' in modified_task["status"]:
-        modified_task["tags"].append("khal")
 
-        ics_to_clean = "~/.calendar/khal/" \
+        ics_to_clean = "/home/seventh/.calendars/khal/" \
             + modified_task["project"].split(".")[0] \
             + "/" \
             + modified_task["uuid"] \
@@ -55,59 +54,60 @@ def main(original_task, modified_task):
     if 'scheduled' in modified_task:
         if "scheduled" in original_task and \
                 original_task["scheduled"] != modified_task["scheduled"]:
-            ics_to_clean = "~/.calendar/khal/" \
+
+            ics_to_clean = "/home/seventh/.calendars/khal/" \
                 + modified_task["project"].split(".")[0] \
                 + "/" \
                 + modified_task["uuid"] \
                 + ".ics"
 
             cleanup(ics_to_clean)
-        # today = datetime.datetime.now().strftime("%Y%m%dT%H%M%SZ")
-        # if original_task["scheduled"] == modified_task["scheduled"] and \
-        #         original_task["scheduled"] < today:
-        #     modified_task["scheduled"] = today + timedelta(days=1)
 
-        scheduled_task(modified_task, khal_calendar)
+        modified_task["scheduled"] = task_to_schedule(modified_task,
+                                                      khal_calendar,
+                                                      'scheduled')
 
     # DUE TASKS
     if 'due' in modified_task:
         if "due" in original_task and\
                 original_task["due"] != modified_task["due"]:
-            ics_to_clean = "~/.calendar/khal/" \
+            ics_to_clean = "/home/seventh/.calendars/khal/" \
                 + modified_task["project"].split(".")[0] \
                 + "/" \
                 + modified_task["uuid"] \
                 + ".ics"
 
             cleanup(ics_to_clean)
-        # today = datetime.datetime.now().strftime("%Y%m%dT%H%M%SZ")
-        # if original_task["due"] == modified_task["scheduled"] and \
-        #         original_task["due"] < today:
-        #     modified_task["due"] = today + timedelta(days=1)
 
-        due_task(modified_task, khal_calendar)
+        modified_task["due"] = task_to_schedule(modified_task,
+                                                khal_calendar,
+                                                'due')
 
     sys.stdout.write(json.dumps(modified_task, separators=(",", ":")))
     sys.exit(0)
 
 
-def scheduled_task(new_task, khal_calendar):
+def task_to_schedule(new_task, khal_calendar, scheduling_type):
     """
-    Function to handle scheduled tasks
+    Function to handle scheduled or due tasks
 
     :new_task: task to add to khal.
     :khal_calendar: khal calendar to add the event with a scheduled date.
+    :scheduling_type: can be one fo these: scheduled or due.
 
     :return: None
     """
     calendar = Calendar()
     event = Event()
-    event.name = new_task["project"] + ":" + new_task["description"]
+    event.name = new_task["description"]
     event.uid = new_task["uuid"]
 
-    start = dt.strptime(new_task["scheduled"], "%Y%m%dT%H%M%SZ")
-    event.begin = start.strftime("%Y%m%dT%H%M%SZ")
-    day_end = start + timedelta(hours=1)
+    start = check_event_time(new_task[scheduling_type])
+    new_task[scheduling_type] = start
+    event.begin = start
+
+    # TODO: get pommodoro time or not
+    day_end = format_date(start) + timedelta(hours=1)
     event.end = day_end.strftime("%Y%m%dT%H%M%SZ")
 
     calendar.events.add(event)
@@ -119,34 +119,63 @@ def scheduled_task(new_task, khal_calendar):
     execute(khal_calendar, ics_name)
     cleanup(ics_name)
 
+    return start
 
-def due_task(new_task, khal_calendar):
+
+def check_event_time(task_date):
     """
-    Function to handle due tasks
-
-    :new_task: task to add to khal.
-    :khal_calendar: khal calendar to add the event with a due date.
-
-    :return: None
     """
-    calendar = Calendar()
-    event = Event()
-    event.name = new_task["project"] + ":" + new_task["description"]
-    event.uid = new_task["uuid"]
+    tw_date = format_date(task_date)
+    time_diff = timezone('Europe/Zurich').utcoffset(tw_date, is_dst=False)
+    localized_date = tw_date + time_diff
 
-    start = dt.strptime(new_task["due"], "%Y%m%dT%H%M%SZ")
-    event.begin = start.strftime("%Y%m%dT%H%M%SZ")
-    day_end = start + timedelta(hours=1)
-    event.end = day_end.strftime("%Y%m%dT%H%M%SZ")
+    if localized_date.hour == 0:
+        # If it's midnight
+        # TODO: get first start hours from config
+        new_date = dt(localized_date.year,
+                      localized_date.month,
+                      localized_date.day,
+                      8, 30, 0, 0) - time_diff
 
-    calendar.events.add(event)
+        return new_date.strftime("%Y%m%dT%H%M%SZ")
 
-    ics_name = new_task['uuid'] + ".ics"
-    with open(ics_name, 'w') as cal_file:
-        cal_file.writelines(calendar)
+    if localized_date.hour < 6 and localized_date.hour > 0:
+        # if it's during sleepy time reschedule it at 18h
+        # TODO: get sleepy hours from config
+        new_date = dt(localized_date.year,
+                      localized_date.month,
+                      localized_date.day,
+                      18, 30, 0, 0) - time_diff
 
-    execute(khal_calendar, ics_name)
-    cleanup(ics_name)
+        return new_date.strftime("%Y%m%dT%H%M%SZ")
+
+    if localized_date.hour > 20 and localized_date.hour < 23:
+        # if it's after dinner
+        # TODO: get after dinner hours from config
+        new_date = dt(localized_date.year,
+                      localized_date.month,
+                      localized_date.day,
+                      10, 30, 0, 0) - time_diff
+
+        return new_date.strftime("%Y%m%dT%H%M%SZ")
+
+    new_date = dt(localized_date.year,
+                  localized_date.month,
+                  localized_date.day,
+                  localized_date.hour,
+                  localized_date.minute,
+                  localized_date.second,
+                  0) - time_diff
+
+    return new_date.strftime("%Y%m%dT%H%M%SZ")
+
+
+def format_date(tw_date):
+    """
+    :tw_date: Taskwarrior date unformatted (str).
+    :return: The datetime date formatted.
+    """
+    return dt.strptime(tw_date, "%Y%m%dT%H%M%SZ")
 
 
 def execute(khal_calendar, ics_file):
@@ -168,7 +197,7 @@ def cleanup(ics_name):
     :ics_name: The ics file to be removed.
     :returns: None
     """
-    command = ["rm", "-f", ics_name]
+    command = ["rm", ics_name]
     proc = subprocess.Popen(command, stdout=subprocess.PIPE)
     proc.communicate()
 
@@ -177,7 +206,7 @@ def check_existing_event(ics_uuid, khal_calendar):
     """Checks if the UUID of an event created by Task exists already. If the
     event exists already delete the existing entry.
     """
-    khal_calendar_location = "~/.calendars/khal/" \
+    khal_calendar_location = "/home/seventh/.calendars/khal/" \
         + khal_calendar \
         + "/" \
         + ics_uuid \
