@@ -11,6 +11,7 @@ from datetime import datetime as dt
 from datetime import timedelta
 
 from pathlib import Path
+from pytz import timezone
 
 from ics import Event
 from ics import Calendar
@@ -39,34 +40,43 @@ def main(new_task):
     check_existing_event(new_task["uuid"], khal_calendar)
 
     if 'scheduled' in new_task:
-        scheduled_task(new_task, khal_calendar)
+        new_task["scheduled"] = task_to_schedule(new_task,
+                                                 khal_calendar,
+                                                 'scheduled')
 
     if 'due' in new_task:
-        due_task(new_task, khal_calendar)
+        new_task["due"] = task_to_schedule(new_task,
+                                           khal_calendar,
+                                           'due')
 
     new_task["tags"].append("khal")
+
     sys.stdout.write(json.dumps(new_task, separators=(",", ":")))
     sys.exit(0)
 
 
-def scheduled_task(new_task, khal_calendar):
+def task_to_schedule(new_task, khal_calendar, scheduling_type):
     """
-    Function to handle scheduled tasks
+    Function to handle scheduled or due tasks
 
     :new_task: task to add to khal.
     :khal_calendar: khal calendar to add the event with a scheduled date.
+    :scheduling_type: can be one fo these: scheduled or due.
 
     :return: None
     """
     calendar = Calendar()
     event = Event()
-    event.name = new_task["project"] + ":" + new_task["description"]
+    event.name = new_task["description"]
     event.uid = new_task["uuid"]
 
-    start = dt.strptime(new_task["scheduled"], "%Y%m%dT%H%M%SZ")
-    event.begin = start.strftime("%Y%m%dT%H%M%SZ+02:00")
-    day_end = start + timedelta(hours=1)
-    event.end = day_end.strftime("%Y%m%dT%H%M%SZ+02:00")
+    start = check_event_time(new_task[scheduling_type])
+    new_task[scheduling_type] = start
+    event.begin = start
+
+    # TODO: get pommodoro time or not
+    day_end = format_date(start) + timedelta(hours=1)
+    event.end = day_end.strftime("%Y%m%dT%H%M%SZ")
 
     calendar.events.add(event)
 
@@ -76,35 +86,62 @@ def scheduled_task(new_task, khal_calendar):
 
     execute(khal_calendar, ics_name)
     cleanup(ics_name)
+    return start
 
 
-def due_task(new_task, khal_calendar):
+def check_event_time(task_date):
     """
-    Function to handle due tasks
-
-    :new_task: task to add to khal.
-    :khal_calendar: khal calendar to add the event with a due date.
-
-    :return: None
     """
-    calendar = Calendar()
-    event = Event()
-    event.name = new_task["project"] + ":" + new_task["description"]
-    event.uid = new_task["uuid"]
+    tw_date = format_date(task_date)
+    time_diff = timezone('Europe/Zurich').utcoffset(tw_date, is_dst=False)
+    localized_date = tw_date + time_diff
 
-    start = dt.strptime(new_task["due"], "%Y%m%dT%H%M%SZ")
-    event.begin = start.strftime("%Y%m%dT%H%M%SZ+02:00")
-    day_end = start + timedelta(hours=1)
-    event.end = day_end.strftime("%Y%m%dT%H%M%SZ+02:00")
+    if localized_date.hour == 0:
+        # If it's midnight
+        # TODO: get first start hours from config
+        new_date = dt(localized_date.year,
+                      localized_date.month,
+                      localized_date.day,
+                      8, 30, 0, 0) - time_diff
 
-    calendar.events.add(event)
+        return new_date.strftime("%Y%m%dT%H%M%SZ")
 
-    ics_name = new_task['uuid'] + ".ics"
-    with open(ics_name, 'w') as cal_file:
-        cal_file.writelines(calendar)
+    elif localized_date.hour < 6 and localized_date.hour > 0:
+        # if it's during sleepy time reschedule it at 18h
+        # TODO: get sleepy hours from config
+        new_date = dt(localized_date.year,
+                      localized_date.month,
+                      localized_date.day,
+                      18, 30, 0, 0) - time_diff
 
-    execute(khal_calendar, ics_name)
-    cleanup(ics_name)
+        return new_date.strftime("%Y%m%dT%H%M%SZ")
+
+    elif localized_date.hour > 20 and localized_date.hour < 23:
+        # if it's after dinner
+        # TODO: get after dinner hours from config
+        new_date = dt(localized_date.year,
+                      localized_date.month,
+                      localized_date.day,
+                      10, 30, 0, 0) - time_diff
+
+        return new_date.strftime("%Y%m%dT%H%M%SZ")
+
+    new_date = dt(localized_date.year,
+                  localized_date.month,
+                  localized_date.day,
+                  localized_date.hour,
+                  localized_date.minute,
+                  localized_date.second,
+                  0) - time_diff
+
+    return new_date.strftime("%Y%m%dT%H%M%SZ")
+
+def format_date(tw_date):
+    """
+    :tw_date: Taskwarrior date unformatted (str).
+    :return: The datetime date formatted.
+    """
+    return dt.strptime(tw_date, "%Y%m%dT%H%M%SZ")
 
 
 def execute(khal_calendar, ics_file):
