@@ -29,7 +29,7 @@ def main():
     # TODO: Khal logic
     # TODO: Set khal proper days
 
-    task_war = TaskW()
+    task_war = TaskW(config_filename="./taskrcdir")
     tw_config = task_war.load_config()
     tw_config_location = tw_config['data']['location']
     tw_projects = tw_config['uda.trsw.projects'].split(',')
