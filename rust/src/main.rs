@@ -1,10 +1,14 @@
 extern crate config;
-use std::process::Command;
 extern crate ics;
-use std::io::Result;
+extern crate chrono;
 
+use std::process::Command;
+use std::io::Result;
 use ics::properties::{Categories, Description, DtEnd, DtStart, Organizer, Status, Summary};
 use ics::{escape_text, Event, ICalendar};
+use chrono::Local;
+use chrono::prelude::*;
+
 
 // Project sources
 pub use self::structs::Task;
@@ -32,15 +36,33 @@ fn main() {
 
     for task in &tasks {
         println!("{:?}", task);
+        create_event(task.to_owned());
     }
+
 }
 
 
 fn create_event(task: Task) -> std::io::Result<()> {
-
     let mut calendar = ICalendar::new("2.0", "-//Rootbytes Org//TKRW Calendar Version 1.0//EN");
     //https://crates.io/crates/ics
-    //let mut event = Event::new(
+
+    //let now = Local::now().format("%Y%m%dT%H%M%SZ");
+
+    let mut event = Event::new(task.uuid, "19960704T120000Z");
+
+    if let Some(scheduled) = task.scheduled {
+        let mut end_scheduled = scheduled.parse::<DateTime<Utc>>();
+        end_scheduled.unwrap().format("%Y%m%dT%H%M%SZ").to_string();
+        event.push(DtStart::new(scheduled));
+
+    };
+        //event.push(DtEnd::new(end_scheduled.unwrap().format("%Y%m%dT%H%M%SZ").to_string()));
+
+    // if let Some(due) = task.due {
+    //     event.push(DtStart::new(due));
+    // }
+
+    return Ok(());
 
 
 }

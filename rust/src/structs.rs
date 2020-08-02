@@ -9,6 +9,8 @@ pub struct Task {
     pub project: String,
     pub status: String,
     pub urgency: f64,
+    pub scheduled: Option<String>,
+    pub due: Option<String>,
     pub uuid: String
 }
 
