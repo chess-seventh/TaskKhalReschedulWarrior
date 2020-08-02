@@ -51,7 +51,7 @@ fn create_event(task: Task) -> std::io::Result<()> {
     let mut event = Event::new(task.uuid, "19960704T120000Z");
 
     if let Some(scheduled) = task.scheduled {
-        let mut end_scheduled = scheduled.parse::<DateTime<Utc>>();
+        let end_scheduled = scheduled.parse::<DateTime<Utc>>();
         end_scheduled.unwrap().format("%Y%m%dT%H%M%SZ").to_string();
         event.push(DtStart::new(scheduled));
 
