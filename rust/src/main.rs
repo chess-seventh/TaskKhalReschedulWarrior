@@ -36,14 +36,21 @@ fn main() {
 
     for task in &tasks {
         println!("{:?}", task);
-        create_event(task.to_owned());
+        match create_event(task.to_owned()) {
+            Ok(_) => println!("All good mate!"),
+            Err(_) => println!("It failed mate!")
+        }
     }
 
 }
 
 
 fn create_event(task: Task) -> std::io::Result<()> {
-    let mut calendar = ICalendar::new("2.0", "-//Rootbytes Org//TKRW Calendar Version 1.0//EN");
+    println!("\n\n====================");
+    println!("We're in the create_event function !");
+    println!("====================\n");
+
+    let calendar = ICalendar::new("2.0", "-//Rootbytes Org//TKRW Calendar Version 1.0//EN");
     //https://crates.io/crates/ics
 
     //let now = Local::now().format("%Y%m%dT%H%M%SZ");
@@ -51,12 +58,16 @@ fn create_event(task: Task) -> std::io::Result<()> {
     let mut event = Event::new(task.uuid, "19960704T120000Z");
 
     if let Some(scheduled) = task.scheduled {
-        let end_scheduled = scheduled.parse::<DateTime<Utc>>();
-        end_scheduled.unwrap().format("%Y%m%dT%H%M%SZ").to_string();
-        event.push(DtStart::new(scheduled));
+        let end_scheduled = match scheduled.parse::<DateTime<Utc>>() {
+            Ok(e) => scheduled.format("%Y%m%dT%H%M%SZ").to_string(),
+        };
+        //end_scheduled.unwrap_err();
+        //match end_scheduled.unwrap().format("%Y%m%dT%H%M%SZ").to_string() {
 
+        //}
+        //println!("this is the values of end_scheduled >>>>         {:?}", end_scheduled);
+        event.push(DtStart::new(scheduled));
     };
-        //event.push(DtEnd::new(end_scheduled.unwrap().format("%Y%m%dT%H%M%SZ").to_string()));
 
     // if let Some(due) = task.due {
     //     event.push(DtStart::new(due));
