@@ -11,7 +11,7 @@ curtsies==0.3.0
 greenlet==0.4.15
 icalendar==4.0.3
 ics==0.4
-idna==2.8
+idna==3.7
 isort==4.3.21
 khal==0.9.10
 lazy-object-proxy==1.4.3
