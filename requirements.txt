@@ -6,7 +6,7 @@ bpython==0.17.1
 certifi==2024.7.4
 chardet==3.0.4
 Click==7.0
-configobj==5.0.6
+configobj==5.0.9
 curtsies==0.3.0
 greenlet==0.4.15
 icalendar==4.0.3
